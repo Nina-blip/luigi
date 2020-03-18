@@ -1,26 +1,25 @@
 package be.vdab.luigi.controllers;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalTime;
 
-@RestController
+@Controller
 @RequestMapping("/")
 class IndexController {
     @GetMapping
-    public String index(){
-        StringBuilder buffer = new StringBuilder("<!doctype html><html><title>Hallo</title><body>");
+    public ModelAndView index(){
         int uur = LocalTime.now().getHour();
         if (uur < 12){
-            buffer.append("Goedemorgen");
+            return new ModelAndView("index","boodschap","morgen");
         } else if (uur < 18){
-            buffer.append("Goedemiddag");
+            return new ModelAndView("index", "boodschap", "middag");
         } else {
-            buffer.append("Goedeavond");
+            return new ModelAndView("index", "boodschap", "avond");
         }
-        buffer.append("</body></html>");
-        return buffer.toString();
     }
 }
