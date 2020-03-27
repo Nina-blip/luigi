@@ -1,12 +1,15 @@
 package be.vdab.luigi.controllers;
 
 import be.vdab.luigi.domain.Pizza;
+import be.vdab.luigi.exceptions.KoersClientException;
+import be.vdab.luigi.services.EuroService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -30,16 +33,30 @@ class PizzaController {
                 .collect(Collectors.toList());
     }
 
+    private final EuroService euroService;
+
+    PizzaController(EuroService euroService) {
+        this.euroService = euroService;
+    }
+
     @GetMapping
     public ModelAndView pizzas() {
         return new ModelAndView("pizzas", "pizzas", pizzas);
     }
 
     @GetMapping("{id}")
-    public ModelAndView pizza(@PathVariable long id){
+    public ModelAndView pizza(@PathVariable long id) {
         ModelAndView modelAndView = new ModelAndView("pizza");
-        Arrays.stream(pizzas).filter(pizza -> pizza.getId()== id).findFirst()
-                .ifPresent(pizza -> modelAndView.addObject(pizza));
+        Arrays.stream(pizzas).filter(pizza -> pizza.getId() == id).findFirst()
+                .ifPresent(pizza -> {
+                    modelAndView.addObject("pizza", pizza);
+                    try {
+                        modelAndView.addObject("inDollar", euroService.naarDollar(pizza.getPrijs()));
+                    } catch (KoersClientException ex) {
+                        ex.printStackTrace(System.err);
+                    }
+
+                });
         return modelAndView;
     }
 
@@ -50,7 +67,7 @@ class PizzaController {
 
     @GetMapping("prijzen/{prijs}")
     public ModelAndView pizzasMetEenPrijs(@PathVariable BigDecimal prijs) {
-        ModelAndView modelAndView = new ModelAndView("prijzen","pizzas",pizzasMetPrijs(prijs));
+        ModelAndView modelAndView = new ModelAndView("prijzen", "pizzas", pizzasMetPrijs(prijs));
         modelAndView.addObject("prijzen", uniekePrijzen());
         return modelAndView;
     }
