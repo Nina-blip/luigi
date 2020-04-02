@@ -1,6 +1,8 @@
 package be.vdab.luigi.restclients;
 
 import be.vdab.luigi.exceptions.KoersClientException;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -11,6 +13,7 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 @Component
+@Order(1)
 class FixerKoersClient implements KoersClient {
     private static final Pattern PATTERN = Pattern.compile(".*\"USD\":");
     private final URL url;

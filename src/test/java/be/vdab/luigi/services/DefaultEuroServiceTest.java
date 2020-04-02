@@ -21,7 +21,7 @@ class DefaultEuroServiceTest {
 
     @BeforeEach
     void beforeEach(){
-        euroservice = new DefaultEuroService(koersClient);
+        euroservice = new DefaultEuroService(new KoersClient[]{koersClient});
     }
 
     @Test
