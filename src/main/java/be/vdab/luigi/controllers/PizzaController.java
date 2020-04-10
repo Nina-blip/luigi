@@ -3,6 +3,7 @@ package be.vdab.luigi.controllers;
 import be.vdab.luigi.domain.Pizza;
 import be.vdab.luigi.exceptions.KoersClientException;
 import be.vdab.luigi.services.EuroService;
+import be.vdab.luigi.services.PizzaService;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -36,21 +36,23 @@ class PizzaController {
     }
 
     private final EuroService euroService;
+    private final PizzaService pizzaService;
     private final Logger logger= LoggerFactory.getLogger(this.getClass());
 
-    PizzaController(EuroService euroService) {
+    PizzaController(EuroService euroService, PizzaService pizzaService) {
         this.euroService = euroService;
+        this.pizzaService = pizzaService;
     }
 
     @GetMapping
     public ModelAndView pizzas() {
-        return new ModelAndView("pizzas", "pizzas", pizzas);
+        return new ModelAndView("pizzas", "pizzas", pizzaService.findAll());
     }
 
     @GetMapping("{id}")
     public ModelAndView pizza(@PathVariable long id) {
         ModelAndView modelAndView = new ModelAndView("pizza");
-        Arrays.stream(pizzas).filter(pizza -> pizza.getId() == id).findFirst()
+        pizzaService.findById(id)
                 .ifPresent(pizza -> {
                     modelAndView.addObject("pizza", pizza);
                     try {
@@ -65,13 +67,13 @@ class PizzaController {
 
     @GetMapping("prijzen")
     public ModelAndView prijzen() {
-        return new ModelAndView("prijzen", "prijzen", uniekePrijzen());
+        return new ModelAndView("prijzen", "prijzen", pizzaService.findUniekePrijzen());
     }
 
     @GetMapping("prijzen/{prijs}")
     public ModelAndView pizzasMetEenPrijs(@PathVariable BigDecimal prijs) {
-        ModelAndView modelAndView = new ModelAndView("prijzen", "pizzas", pizzasMetPrijs(prijs));
-        modelAndView.addObject("prijzen", uniekePrijzen());
+        ModelAndView modelAndView = new ModelAndView("prijzen", "pizzas", pizzaService.findByPrijs(prijs));
+        modelAndView.addObject("prijzen", pizzaService.findUniekePrijzen());
         return modelAndView;
     }
 }
