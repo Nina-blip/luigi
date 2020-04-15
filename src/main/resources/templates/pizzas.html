@@ -4,6 +4,8 @@
 </head>
 <body>
 <nav th:replace="fragments::menu"></nav>
+<div th:if="${param.toegevoegd}!=null" class="boodschap">Pizza is toegevoegd.
+    Hij heeft het nummer <span th:text="${param.toegevoegd}"></span>.</div>
 <h1>Pizza's</h1>
 <ul class="zebra">
     <li th:each="pizza:${pizzas}" th:object="${pizza}">
