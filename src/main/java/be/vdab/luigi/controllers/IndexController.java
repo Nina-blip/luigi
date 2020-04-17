@@ -2,6 +2,7 @@ package be.vdab.luigi.controllers;
 
 import be.vdab.luigi.domain.Adres;
 import be.vdab.luigi.domain.Persoon;
+import be.vdab.luigi.sessions.Identificatie;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequestMapping("/")
 class IndexController {
     private final AtomicInteger aantalKeerBezocht = new AtomicInteger();
+
+
     private String boodschap() {
         int uur = LocalTime.now().getHour();
         if (uur < 12) {
